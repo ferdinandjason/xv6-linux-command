@@ -1,7 +1,11 @@
-#include "unistd.h"
+#include "types.h"
+#include "stat.h"
+#include "user.h"
+#include "fcntl.h"
+#include "fs.h"
 
 int main()
 {
-    const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
-    write(STDOUT_FILENO,CLEAR_SCREEN_ANSI,12);
+    printf(1,"\033[2J\033[1;1H\n");
+    exit();
 }
