@@ -14,6 +14,12 @@ int main()
         exit();
     }
     int red=read(err,cwd,sizeof(cwd));
+    if(red<0)
+    {
+        printf(2,"ERROR\n");
+        exit();
+    }
     close(err);
     printf(1,"%s\n",cwd);
+    exit();
 }
