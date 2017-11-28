@@ -73,7 +73,7 @@ void mv(char *argv1,char *argv2)
 }
 
 void
-ls(char *path,char *argv2)
+ls(char *path,char *argv2,int longz,char *hehe)
 {
   char buf[512],temp[512], *p;
   int fd;
@@ -116,7 +116,12 @@ ls(char *path,char *argv2)
         continue;
       }
       if(strcmp(fmtname(buf),".")==0 || strcmp(fmtname(buf),"..")==0) continue;
-      mv(fmtname(buf),temp);
+      if(strcmp(fmtname(buf)+(strlen(fmtname(buf))-longz),hehe)==0)
+      {
+        //printf(1,"%s\n",fmtname(buf));
+        mv(fmtname(buf),temp);
+      }
+      //
     }
     break;
   }
@@ -131,10 +136,12 @@ int main(int argc,char *argv[])
         printf(1,"Need 2 arguments!\n");
         exit();
     }
-    if(strcmp(argv[1],"*")==0)
+    if(argv[1][0]=='*')
     {
-        printf(1,"hehe\n");
-        ls(".",argv[2]);
+        int longz=strlen(argv[1])-1;
+        char hehe[10];
+        strcpy(hehe,argv[1]+1);
+        ls(".",argv[2],longz,hehe);
     }
     else
     {
