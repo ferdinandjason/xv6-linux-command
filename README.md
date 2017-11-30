@@ -1,11 +1,11 @@
 # FPE8-SistemOperasi
 
-Final Project Sistem Operasi - xv6
-Membuat Command pada xv6
+Final Project Sistem Operasi - Membuat Command pada xv6
 
 - [X] `cp`
 - [ ] `cp -R`
 - [ ] `cp *`
+- [ ] `ls`
 - [X] `mv`
 - [X] `mv *`
 - [ ] `rm`
