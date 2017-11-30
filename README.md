@@ -8,7 +8,7 @@ Final Project Sistem Operasi - Membuat Command pada xv6
 - [ ] `ls`
 - [X] `mv`
 - [X] `mv *`
-- [ ] `rm`
+- [X] `rm`
 - [ ] `rm -rf`
 - [X] `cd`
 - [X] `clear`
