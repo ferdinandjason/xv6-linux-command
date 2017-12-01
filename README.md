@@ -12,7 +12,7 @@ Final Project Sistem Operasi - Membuat Command pada xv6
 - [X] `rm -rf`
 - [X] `cd`
 - [X] `clear`
-- [X] `rename`
+- [ ] `rename`
 - [ ] `rename -s`
 - [ ] `rename -v`
 - [ ] `rename -n`
