@@ -1,243 +1,246 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
-#include "fcntl.h"
 #include "fs.h"
+#include "fcntl.h"
 
-char *
+char*
 fmtname(char *path)
 {
-  static char buf[DIRSIZ + 1];
-  char *p;
-
-  // Find first character after last slash.
-  for (p = path + strlen(path); p >= path && *p != '/'; p--)
-    ;
-  p++;
-
-  // Return blank-padded name.
-  if (strlen(p) >= DIRSIZ)
-    return p;
-  memmove(buf, p, strlen(p));
-  //memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
-  return buf;
+    static char buf[512];
+    char *p;
+    for(p=path+strlen(path);p>=path && *p!='/';p--);
+    p++;
+    memmove(buf,p,strlen(p));
+    return buf;
 }
 
-char *strncpy(char *s, const char *t, int n)
+char*
+strcat(char *d,char *s)
 {
-  int i;
-  char *os;
-  os = s;
-  for (i = 0; i < n; i++)
-  {
-    s[i] = t[i];
-  }
-  return os;
+    char *temp=d;
+    while(*d) ++d;
+    while(*s) *d++=*s++;
+    *d=0;
+    return temp;
 }
 
-char *strcat(char *s1, char *s2)
+void
+move(char from[512],char to[512])
 {
-  char *b = s1;
-  while (*s1)
-    ++s1;
-  while (*s2)
-    *s1++ = *s2++;
-  *s1 = 0;
-  return b;
-}
-
-void mv(char *argv1, char *argv2)
-{
-  // printf(2,"MASUK\n");
-  // printf(1,"1 %s\n",argv1);
-  // printf(1,"2 %s\n",argv2);
-  // printf(1,"mv : %s %s\n",argv1,argv2);
-  if(argv1[0]=='.' && argv1[1]=='.') return;
-  char buf[512];
-  int fd0, fd1, n;
-  if ((fd0 = open(argv1, O_RDONLY)) < 0)
-  {
-    printf(2, "mv: cannot open %s\n", argv1);
-    exit();
-  }
-  char temp[512];
-  strncpy(temp, argv1, strlen(argv1));
-  if (unlink(argv1) < 0)
-  {
-    printf(2, "error moving %s\n", argv1);
-    exit();
-  }
-  if(temp[0]=='.' && temp[strlen(temp)-1]!='/' && argv2[strlen(argv2)-1]=='/' ) strcat(argv2,temp+2);
-  else if(temp[strlen(temp)-1]!='/' && argv2[strlen(argv2)-1]=='/') strcat(argv2, temp);
-  if ((fd1 = open(argv2, O_CREATE | O_RDWR)) < 0)
-  {
-    printf(2, "mv: cannot open %s\n", argv2);
-    exit();
-  }
-  while ((n = read(fd0, buf, sizeof(buf))) > 0)
-  {
-    write(fd1, buf, n);
-  }
-  close(fd0);
-  close(fd1);
-}
-
-void ls(char path[512], char argv2[512], int longz, char hehe[512])
-{
-  char buf[512], temp[512], *p;
-  int fd;
-  struct dirent de;
-  struct stat st;
-
-  if ((fd = open(path, 0)) < 0)
-  {
-    printf(2, "ls: cannot open %s\n", path);
-    return;
-  }
-
-  if (fstat(fd, &st) < 0)
-  {
-    printf(2, "ls: cannot stat %s\n", path);
-    close(fd);
-    return;
-  }
-
-  switch (st.type)
-  {
-  case T_FILE:
-    //printf(1, "%s %d %d %d\n", fmtname(path), st.type, st.ino, st.size);
-    break;
-
-  case T_DIR:
-    if (strlen(path) + 1 + DIRSIZ + 1 > sizeof buf)
+    struct stat st;
+    char buf[512];
+    int fd0;
+    // OPEN FILE FROM
+    if((fd0=open(from,O_RDONLY))<0)
     {
-      printf(1, "ls: path too long\n");
-      break;
+        printf(2,"mv: cannot open '%s' No such file or directory\n",from);
+        exit();
     }
-    strcpy(buf, path);
-    p = buf + strlen(buf);
-    *p++ = '/';
-    while (read(fd, &de, sizeof(de)) == sizeof(de))
+    // JIKA ADALAH DIREKTORI
+    if(fstat(fd0,&st)>=0)
     {
-      if (de.inum == 0)
-        continue;
-      memset(temp, '\0', sizeof(temp));
-      strcpy(temp, argv2);
-      memmove(p, de.name, DIRSIZ);
-      p[DIRSIZ] = 0;
-      if (stat(buf, &st) < 0)
-      {
-        printf(1, "ls: cannot stat %s\n", buf);
-        continue;
-      }
-      if (strcmp(fmtname(buf), ".") == 0 || strcmp(fmtname(buf), "..") == 0)
-        continue;
-      if (strcmp(fmtname(buf) + (strlen(fmtname(buf)) - longz), hehe) == 0)
-      {
-        //printf(1,"%s\n",fmtname(buf));
-        mv(fmtname(buf), temp);
-      }
-      //
+        if(st.type==T_DIR)
+        {
+            printf(2,"mv: cannot copy directory '%s'\n",from);
+            exit();
+        }
     }
-    break;
-  }
-  close(fd);
+
+    int fd1;
+    char temp[512];
+    if(to[strlen(to)-1]=='/') to[strlen(to)-1]=0;
+    // OPEN FILE TO
+    fd1=open(to,0);
+    if(1)
+    {
+        // JIKA ADALAH DIREKTORI
+        if(fstat(fd1,&st)>=0 && st.type == T_DIR)
+        {
+            strcat(temp,to);
+            strcat(temp,"/");
+            strcat(temp,from);
+            close(fd1);
+            if((fd1=open(temp,O_CREAT | O_TRUNC | O_WRONLY))<0)
+            {
+                printf(2,"cp: error while create '%s'\n",temp);
+                exit();
+            }
+        }
+        // JIKA ADALAH FILE
+        else{
+            close(fd1);
+            if((fd1=open(to,O_CREAT | O_TRUNC | O_WRONLY))<0)
+            {
+                printf(2,"cp: error while create '%s'\n",to);
+                exit();
+            }
+        }
+    }
+    int n;
+    while((n=read(fd0,buf,sizeof(buf)))>0)
+    {
+        printf(fd1,"%s",buf);
+    }
+    unlink(from);
+    close(fd1);
+    exit();
 }
 
-void rekursi(char path[512],char desti[512])
+void
+mv_ls(char path[512],int panjang,char ekstensi[512])
 {
-  //printf(1,"hmm ... %s %s\n",path,desti);
-  char buf[512],*p;
-  int fd;
-  struct dirent de;
-  struct stat st;
-  if((fd=open(path,0))<0){
-    printf(2,"rek: cannot open %s\n",path);
-    exit();
-  }
-  if(fstat(fd,&st)<0){
-    printf(2,"rek: cannot stat %s\n",path);
-    close(fd);
-    exit();
-  }
-  switch(st.type){
-    case T_FILE:
-      //mv(buf,desti);
-      break;
-    case T_DIR:
-      strcpy(buf, path);
-    p = buf+strlen(buf);
-    *p++ = '/';
-    while(read(fd, &de, sizeof(de)) == sizeof(de)){
-      if(de.inum == 0)
-        continue;
-      //memset(temp,'\0',sizeof(temp));
-      //strcpy(temp,argv2);
-      memmove(p, de.name, DIRSIZ);
-      p[DIRSIZ] = 0;
-      if(stat(buf, &st) < 0){
-        printf(1, "rek: cannot stat %s\n", buf);
-        continue;
-      }
-      if(buf[strlen(buf)-1]=='.') continue;
-      if(strcmp(fmtname(buf),".")==0 || strcmp(fmtname(buf),"..")==0) continue;
-      if(st.type==T_DIR){
-        char tempe[512],he[512],he2[512];
-        strcpy(tempe,desti);
-        //printf(1,"%s\n",tempe);
-        mkdir(strcat(tempe,buf+2));
-        strcpy(he,buf);
-        strcpy(he2,desti);
-        //printf(1,"%s %s\n",tempe,desti);
-        //printf(1,"%s-> %s\n",buf,desti);
-        rekursi(he,he2);
-        unlink(buf);
-      }
-      else if(st.type==T_FILE){
-        //printf(1,"file %s with tujuan %s\n",buf,desti);
-        char hehe[512],hehe2[512];
-        strcpy(hehe,buf);
-        //printf(1,"%s \n",hehe);
-        strcpy(hehe2,desti);
-        //printf(1,"%s\n",hehe2);
-        mv(hehe,hehe2);
-        //printf(1,"mvnya selesai\n");
-      }
-      //if(strcmp(fmtname(buf),".")==0 || strcmp(fmtname(buf),"..")==0) continue;
-      //if(strcmp(fmtname(buf)+(strlen(fmtname(buf))-longz),hehe)==0)
-      //{
-        //printf(1,"%s\n",fmtname(buf));
-        //mv(fmtname(buf),temp);
-      //}
-      //
+    char buff[1024];
+    int fd0,fd1;
+    struct dirent de;
+    struct stat st;
+    if(path[strlen(path)-1]=='/') path[strlen(path)-1]=0;
+    if((fd0=open(".",0))<0)
+    {
+        printf(2,"mv: cannot open '\".\"' No such file or directory\n");
+        exit();
     }
-    break;
-  }
-  close(fd);
+
+    if((fd1=open(path,O_RDONLY))<0)
+    {
+        printf(2,"mv: cannot open '%s' No such file or directory\n",path);
+        exit();
+    }
+    if(fstat(fd1,&st)<0)
+    {
+        printf(2,"mv: cannot stat '%s' No such file or directory\n",path);
+        exit();
+    }
+    else
+    {
+        if(st.type!=T_DIR)
+        {
+            printf(2,"mv: '%s' is not directory\n",path);
+            exit();
+        }
+    }
+    // tidak perlu switch karena sudah pasti masuk ke direktori
+    strcat(buff,path);
+    strcat(buff,"/");
+    int len=strlen(buff);
+    while(read(fd0,&de,sizeof(de))==sizeof(de))
+    {
+        if(de.inum==0) 
+            continue;
+        if(de.name[0]=='.')
+            continue;
+        if(stat(de.name, &st) >= 0 && st.type == T_DIR) continue;
+        memmove(buff+len,de.name,strlen(de.name));
+        //if(strcmp(de.name+(strlen(de.name)-panjang-1),ekstensi)==0) 
+        move(de.name,buff);
+        memset(buff+len,'\0',sizeof(buff)+len);
+    }
+    close(fd0);
 }
 
-
-
-int main(int argc, char *argv[])
+void
+mv_rek(char from[512],char to[512])
 {
-  if (argc <= 2)
-  {
-    printf(1, "Need 2 arguments!\n");
+    char buff[512];
+    int fd0;
+    struct dirent de;
+    struct stat st;
+    if(from[strlen(from)-1]=='/') from[strlen(from)-1]=0;
+    if(to[strlen(to)-1]=='/') to[strlen(to)-1]=0;
+    if((fd0=open(from,0))<0)
+    {
+        printf(2,"mv: cannot open '%s' No such file or directory\n",from);
+        exit();
+    }
+    if(fstat(fd0,&st)<0)
+    {
+        printf(2,"mv: cannot stat '%s' No such file or directory\n",from);
+        exit();
+    }
+    char temp[100];
+    switch(st.type)
+    {
+        case T_FILE:
+        {
+            move(from,to);
+            unlink(from);
+            break;
+        }
+        case T_DIR:
+        {
+            strcpy(buff,to);
+            strcat(buff,"/");
+            strcat(buff,from);
+            if(mkdir(to)>=0)
+            {
+                while(read(fd0,&de,sizeof(de))==sizeof(de))
+                {
+                    char temp2[100]={0};
+                    if(de.inum==0 || de.name[0]=='.') 
+                        continue;
+                    strcpy(temp,from);
+                    strcat(temp,"/");
+                    strcat(temp,de.name);
+                    strcpy(temp2,to);
+                    printf(1,"%s\n",temp2);
+                    strcat(temp2,"/");
+                    printf(1,"%s\n",temp2);
+                    strcat(temp2,de.name);
+                    printf(1,"%s\n",temp2);
+                    printf(1,"%s %s %s\n",to,de.name,temp2);
+                    printf(1,"1. %s %s\n",temp,temp2);
+                    mv_rek(temp,temp2);
+                    unlink(from);
+                }
+            }
+            else
+            {
+                mkdir(buff);
+                while(read(fd0,&de,sizeof(de))==sizeof(de))
+                {
+                    char temp2[100]={0};
+                    if(de.inum==0 || de.name[0]=='.') 
+                        continue;
+                    strcpy(temp,from);
+                    strcat(temp,"/");
+                    strcat(temp,de.name);
+                    strcpy(temp2,buff);
+                    strcat(temp2,"/");
+                    strcat(temp2,de.name);
+                    printf(1,"2. %s %s\n",temp,temp2);
+                    mv_rek(temp,temp2);
+                    unlink(from);
+                }
+            }
+            break;
+        }
+        close(fd0);
+    }
+}
+
+int main(int argc,char *argv[])
+{
+    if(argc<2)
+    {
+
+    }
+    /*if(argv[1][0]=='*')
+    {
+        int panjang=strlen(argv[1]);
+        char eks[512];
+        strcpy(eks,argv[1]+1);
+        cp_ls(argv[2],panjang,eks);
+        exit();
+    }*/
+    if(strcmp(argv[1],"*")==0)
+    {
+        mv_rek(argv[2],argv[3]);
+        exit();
+    }
+    else
+    {
+        move(argv[1],argv[2]);
+        exit();
+    }
     exit();
-  }
-  if(strcmp(argv[1],"*")==0){
-    rekursi(".",argv[2]);
-  }
-  if (argv[1][0] == '*')
-  {
-    int longz = strlen(argv[1]) - 1;
-    char hehe[10];
-    strcpy(hehe, argv[1] + 1);
-    ls(".", argv[2], longz, hehe);
-  }
-  else
-  {
-    mv(argv[1], argv[2]);
-  }
-  exit();
 }
