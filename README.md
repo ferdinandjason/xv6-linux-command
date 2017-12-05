@@ -5,7 +5,7 @@ Final Project Sistem Operasi - Membuat Command pada xv6
 - [X] `cp`
 - [X] `cp -R`
 - [X] `cp *`
-- [ ] `ls`
+- [X] `ls`
 - [X] `mv`
 - [X] `mv *`
 - [X] `rm`
