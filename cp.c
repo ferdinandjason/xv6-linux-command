@@ -26,8 +26,9 @@ strcat(char *d,char *s)
 }
 
 void
-copy(char from[512],char to[512])
+copy(char *from,char *to)
 {
+    printf(1,"masuk ke copy : %s %s\n",from,to);
     struct stat st;
     char buf[512];
     int fd0;
@@ -132,7 +133,6 @@ cp_ls(char path[512],int panjang,char ekstensi[512])
         memmove(buff+len,de.name,strlen(de.name));
         //if(strcmp(de.name+(strlen(de.name)-panjang-1),ekstensi)==0) 
         copy(de.name,buff);
-        printf(1,"%s %s\n",de.name,buff);
         memset(buff+len,'\0',sizeof(buff)+len);
     }
     close(fd0);
@@ -157,9 +157,7 @@ cp_rek(char from[512],char to[512])
         printf(2,"cp: cannot stat '%s' No such file or directory\n",from);
         exit();
     }
-    char *temp=malloc(512),*temp2=malloc(512);
-    memset(temp,0,sizeof(temp));
-    memset(temp2,0,sizeof(temp2));
+    char temp[512],temp2[512];
     switch(st.type)
     {
         case T_FILE:

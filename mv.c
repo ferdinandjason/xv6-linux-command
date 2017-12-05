@@ -63,7 +63,7 @@ move(char from[512],char to[512])
             close(fd1);
             if((fd1=open(temp,O_CREAT | O_TRUNC | O_WRONLY))<0)
             {
-                printf(2,"cp: error while create '%s'\n",temp);
+                printf(2,"mv: error while create '%s'\n",temp);
                 exit();
             }
         }
@@ -72,7 +72,7 @@ move(char from[512],char to[512])
             close(fd1);
             if((fd1=open(to,O_CREAT | O_TRUNC | O_WRONLY))<0)
             {
-                printf(2,"cp: error while create '%s'\n",to);
+                printf(2,"mv: error while create '%s'\n",to);
                 exit();
             }
         }
@@ -82,8 +82,8 @@ move(char from[512],char to[512])
     {
         printf(fd1,"%s",buf);
     }
-    unlink(from);
     close(fd1);
+    unlink(from);
     exit();
 }
 
@@ -103,7 +103,7 @@ mv_ls(char path[512],int panjang,char ekstensi[512])
 
     if((fd1=open(path,O_RDONLY))<0)
     {
-        printf(2,"mv: cannot open '%s' No such file or directory\n",path);
+        printf(2,"~mv: cannot open '%s' No such file or directory\n",path);
         exit();
     }
     if(fstat(fd1,&st)<0)
@@ -141,12 +141,13 @@ mv_ls(char path[512],int panjang,char ekstensi[512])
 void
 mv_rek(char from[512],char to[512])
 {
-    char buff[512];
+    char buff[1024];
     int fd0;
     struct dirent de;
     struct stat st;
     if(from[strlen(from)-1]=='/') from[strlen(from)-1]=0;
     if(to[strlen(to)-1]=='/') to[strlen(to)-1]=0;
+    printf(1,"%s\n",to);
     if((fd0=open(from,0))<0)
     {
         printf(2,"mv: cannot open '%s' No such file or directory\n",from);
@@ -157,13 +158,12 @@ mv_rek(char from[512],char to[512])
         printf(2,"mv: cannot stat '%s' No such file or directory\n",from);
         exit();
     }
-    char temp[100];
+    char temp[512],temp2[512];
     switch(st.type)
     {
         case T_FILE:
         {
             move(from,to);
-            unlink(from);
             break;
         }
         case T_DIR:
@@ -175,30 +175,22 @@ mv_rek(char from[512],char to[512])
             {
                 while(read(fd0,&de,sizeof(de))==sizeof(de))
                 {
-                    char temp2[100]={0};
                     if(de.inum==0 || de.name[0]=='.') 
                         continue;
                     strcpy(temp,from);
                     strcat(temp,"/");
                     strcat(temp,de.name);
                     strcpy(temp2,to);
-                    printf(1,"%s\n",temp2);
                     strcat(temp2,"/");
-                    printf(1,"%s\n",temp2);
                     strcat(temp2,de.name);
-                    printf(1,"%s\n",temp2);
-                    printf(1,"%s %s %s\n",to,de.name,temp2);
-                    printf(1,"1. %s %s\n",temp,temp2);
+                    printf(1,"%s %s\n",temp,temp2);
                     mv_rek(temp,temp2);
-                    unlink(from);
                 }
             }
             else
             {
-                mkdir(buff);
                 while(read(fd0,&de,sizeof(de))==sizeof(de))
                 {
-                    char temp2[100]={0};
                     if(de.inum==0 || de.name[0]=='.') 
                         continue;
                     strcpy(temp,from);
@@ -207,15 +199,15 @@ mv_rek(char from[512],char to[512])
                     strcpy(temp2,buff);
                     strcat(temp2,"/");
                     strcat(temp2,de.name);
-                    printf(1,"2. %s %s\n",temp,temp2);
+                    printf(1,"%s %s\n",temp,temp2);
                     mv_rek(temp,temp2);
-                    unlink(from);
                 }
             }
+            unlink(to);
             break;
         }
-        close(fd0);
     }
+    close(fd0);
 }
 
 int main(int argc,char *argv[])
@@ -232,9 +224,9 @@ int main(int argc,char *argv[])
         cp_ls(argv[2],panjang,eks);
         exit();
     }*/
-    if(strcmp(argv[1],"*")==0)
+    else if(strcmp(argv[1],"*")==0)
     {
-        mv_rek(argv[2],argv[3]);
+        mv_rek(".",argv[2]);
         exit();
     }
     else
