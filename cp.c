@@ -30,7 +30,8 @@ copy(char *from,char *to)
 {
     printf(1,"masuk ke copy : %s %s\n",from,to);
     struct stat st;
-    char buf[512];
+    char *buf;
+    buf=(char*)malloc(512*sizeof(char));
     int fd0;
     // OPEN FILE FROM
     if((fd0=open(from,O_RDONLY))<0)
@@ -49,7 +50,8 @@ copy(char *from,char *to)
     }
 
     int fd1;
-    char temp[512];
+    char *temp;
+    temp=(char*)malloc(512*sizeof(char));
     if(to[strlen(to)-1]=='/') to[strlen(to)-1]=0;
     // OPEN FILE TO
     fd1=open(to,0);
@@ -84,13 +86,16 @@ copy(char *from,char *to)
         printf(fd1,"%s",buf);
     }
     close(fd1);
+    free(temp);
+    free(buf);
     exit();
 }
 
 void
-cp_ls(char path[512],int panjang,char ekstensi[512])
+cp_ls(char *path,int panjang,char *ekstensi)
 {
-    char buff[1024];
+    char *buff;
+    buff=(char*)malloc(512*sizeof(char*));
     int fd0,fd1;
     struct dirent de;
     struct stat st;
@@ -135,13 +140,15 @@ cp_ls(char path[512],int panjang,char ekstensi[512])
         copy(de.name,buff);
         memset(buff+len,'\0',sizeof(buff)+len);
     }
+    free(buff);
     close(fd0);
 }
 
 void
-cp_rek(char from[512],char to[512])
+cp_rek(char *from,char *to)
 {
-    char buff[1024];
+    char *buff;
+    buff=(char*)malloc(512*sizeof(char*));
     int fd0;
     struct dirent de;
     struct stat st;
@@ -157,7 +164,9 @@ cp_rek(char from[512],char to[512])
         printf(2,"cp: cannot stat '%s' No such file or directory\n",from);
         exit();
     }
-    char temp[512],temp2[512];
+    char *temp,*temp2;
+    temp=(char*)malloc(512*sizeof(char*));
+    temp2=(char*)malloc(512*sizeof(char*));
     switch(st.type)
     {
         case T_FILE:
@@ -204,6 +213,9 @@ cp_rek(char from[512],char to[512])
         }
         close(fd0);
     }
+    free(temp);
+    free(temp2);
+    free(buff);
 }
 
 int main(int argc,char *argv[])
@@ -231,4 +243,4 @@ int main(int argc,char *argv[])
         exit();
     }
     exit();
-}
+}	
