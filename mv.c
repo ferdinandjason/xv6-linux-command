@@ -26,10 +26,11 @@ strcat(char *d,char *s)
 }
 
 void
-move(char from[512],char to[512])
+move(char *from,char *to)
 {
     struct stat st;
-    char buf[512];
+    char *buf;
+    buf=(char*)malloc(512*sizeof(char));
     int fd0;
     // OPEN FILE FROM
     if((fd0=open(from,O_RDONLY))<0)
@@ -48,7 +49,8 @@ move(char from[512],char to[512])
     }
 
     int fd1;
-    char temp[512];
+    char *temp;
+    temp=(char*)malloc(512*sizeof(char));
     if(to[strlen(to)-1]=='/') to[strlen(to)-1]=0;
     // OPEN FILE TO
     fd1=open(to,0);
@@ -83,14 +85,16 @@ move(char from[512],char to[512])
         printf(fd1,"%s",buf);
     }
     close(fd1);
+    free(temp);
+    free(buf);
     unlink(from);
-    exit();
 }
 
 void
-mv_ls(char path[512],int panjang,char ekstensi[512])
+mv_ls(char *path,int panjang,char *ekstensi)
 {
-    char buff[1024];
+    char *buff;
+    buff=(char*)malloc(512*sizeof(char*));
     int fd0,fd1;
     struct dirent de;
     struct stat st;
@@ -135,13 +139,15 @@ mv_ls(char path[512],int panjang,char ekstensi[512])
         move(de.name,buff);
         memset(buff+len,'\0',sizeof(buff)+len);
     }
+    free(buff);
     close(fd0);
 }
 
 void
-mv_rek(char from[512],char to[512])
+mv_rek(char *from,char *to)
 {
-    char buff[1024];
+    char *buff;
+    buff=(char*)malloc(512*sizeof(char*));
     int fd0;
     struct dirent de;
     struct stat st;
@@ -158,7 +164,9 @@ mv_rek(char from[512],char to[512])
         printf(2,"mv: cannot stat '%s' No such file or directory\n",from);
         exit();
     }
-    char temp[512],temp2[512];
+    char *temp,*temp2;
+    temp=(char*)malloc(512*sizeof(char*));
+    temp2=(char*)malloc(512*sizeof(char*));
     switch(st.type)
     {
         case T_FILE:
@@ -183,7 +191,6 @@ mv_rek(char from[512],char to[512])
                     strcpy(temp2,to);
                     strcat(temp2,"/");
                     strcat(temp2,de.name);
-                    printf(1,"%s %s\n",temp,temp2);
                     mv_rek(temp,temp2);
                 }
             }
@@ -199,15 +206,18 @@ mv_rek(char from[512],char to[512])
                     strcpy(temp2,buff);
                     strcat(temp2,"/");
                     strcat(temp2,de.name);
-                    printf(1,"%s %s\n",temp,temp2);
                     mv_rek(temp,temp2);
                 }
+                unlink(temp);
             }
             unlink(to);
             break;
         }
     }
     close(fd0);
+    free(temp);
+    free(temp2);
+    free(buff);
 }
 
 int main(int argc,char *argv[])
@@ -216,14 +226,6 @@ int main(int argc,char *argv[])
     {
 
     }
-    /*if(argv[1][0]=='*')
-    {
-        int panjang=strlen(argv[1]);
-        char eks[512];
-        strcpy(eks,argv[1]+1);
-        cp_ls(argv[2],panjang,eks);
-        exit();
-    }*/
     else if(strcmp(argv[1],"*")==0)
     {
         mv_rek(".",argv[2]);
