@@ -224,7 +224,7 @@ int main(int argc,char *argv[])
 {
     if(argc<2)
     {
-
+        printf(2,"Usage : mv [source] [dest]\n");
     }
     else if(strcmp(argv[1],"*")==0)
     {

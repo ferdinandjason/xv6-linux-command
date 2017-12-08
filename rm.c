@@ -72,7 +72,9 @@ int main(int argc,char *argv[])
     int i;
     if(argc<2)
     {
-        printf(2,"Usage: rm files...\n");
+        printf(2,"Usage: rm [OPTIONS] [files]...\n");
+        printf(2,"Options:\n");
+        printf(2,"  -rf : delete file secara recursive\n");
         exit();
     }
     if(strcmp(argv[1],"-rf")==0)

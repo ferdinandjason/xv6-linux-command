@@ -4,22 +4,24 @@
 #include "fcntl.h"
 #include "fs.h"
 
-void help(){
-printf(1,"Usage:\n");
-printf(1,"pwd [OPTION]\n");
-printf(1,"Options:\n");
-printf(1,"-L : Menampilkan alamat meskipun terdapat symlinks\n");
-printf(1,"-P : Menampilkan alamat tanpa mengandung symlinks\n");
-printf(1,"-h : Memperlihatkan bantuan lalu exit\n");
-printf(1,"-v : Menunjukkan informasi tentang versi lalu exit\n");
-printf(1,"Dikarenakan pada xv6 tidak terdapat synmlinks, maka fungsi dari opsi -L dan -P menjadi sama\n");
-exit();
+void 
+help(){
+    printf(1,"Usage:\n");
+    printf(1,"pwd [OPTION]\n");
+    printf(1,"Options:\n");
+    printf(1,"  -L : Menampilkan alamat meskipun terdapat symlinks\n");
+    printf(1,"  -P : Menampilkan alamat tanpa mengandung symlinks\n");
+    printf(1,"  -h : Memperlihatkan bantuan lalu exit\n");
+    printf(1,"  -v : Menunjukkan informasi tentang versi lalu exit\n");
+    printf(1,"Dikarenakan pada xv6 tidak terdapat synmlinks, maka fungsi dari opsi -L dan -P menjadi sama\n");
+    exit();
 }
 
-void prog(){
-printf(1,"pwd version 1.00\n");
-printf(1,"Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
-exit();
+void
+prog(){
+    printf(1,"pwd version 1.00\n");
+    printf(1,"Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
+    exit();
 }
 
 int main(int argc,char *argv[])

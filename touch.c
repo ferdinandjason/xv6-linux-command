@@ -8,7 +8,7 @@ int main(int argc,char *argv[])
 {
     if(argc<2)
     {
-        printf(1,"Usage: touch files...\n");
+        printf(1,"Usage: touch [files]...\n");
         exit();
     }
     int i,err;

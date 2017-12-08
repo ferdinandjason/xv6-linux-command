@@ -3,18 +3,18 @@
 #include "user.h"
 #include "fcntl.h"
 #include "fs.h"
-int n=0,v=0;
+int n=0,v=0,o=0;
 
 void 
 help(){
     printf (1,"Usage\n");
     printf (1,"rename [OPTION] ekspresi\n");
     printf (1,"Options:\n");
-    printf (1,"-s : TIdak rename symlink, tetapi rename target\n");
-    printf (1,"-v : Menunjukan file mana saja yang telah di rename, apabila ada\n");
-    printf (1,"-n : Tidak melakukan perubahan apapun\n");
-    printf (1,"-o : Tidak overwrite file yang telah ada\n");
-    printf (1,"-V : Menunjukkan informasi tentang versi lalu exit\n");
+    printf (1," -s : TIdak rename symlink, tetapi rename target\n");
+    printf (1," -v : Menunjukan file mana saja yang telah di rename, apabila ada\n");
+    printf (1," -n : Tidak melakukan perubahan apapun\n");
+    printf (1," -o : Tidak overwrite file yang telah ada\n");
+    printf (1," -V : Menunjukkan informasi tentang versi lalu exit\n");
     exit();
 }
 
@@ -60,19 +60,19 @@ void rename(char *argv1, char *argv2)
   int fd0, fd1, n;
   if ((fd0 = open(argv1, O_RDONLY)) < 0)
   {
-    printf(2, "mv: cannot open %s\n", argv1);
+    printf(2, "rename: cannot open %s\n", argv1);
     exit();
   }
   char temp[512];
   strncpy(temp, argv1, strlen(argv1));
   if (unlink(argv1) < 0)
   {
-    printf(2, "error moving %s\n", argv1);
+    printf(2, "error renameing %s\n", argv1);
     exit();
   }
   if ((fd1 = open(argv2, O_CREATE | O_RDWR)) < 0)
   {
-    printf(2, "mv: cannot open %s\n", argv2);
+    printf(2, "rename: cannot open %s\n", argv2);
     exit();
   }
   while ((n = read(fd0, buf, sizeof(buf))) > 0)
@@ -83,24 +83,22 @@ void rename(char *argv1, char *argv2)
   close(fd1);
 }
 void
-mv_rek(char *from,char *ext1,char *ext2)
+rename_rek(char *from,char *ext1,char *ext2)
 {
     //char buff[1024];
     int fd0;
     struct dirent de;
     struct stat st;
-    printf(1,"%s %s\n",ext1,ext2);
     if((fd0=open(from,0))<0)
     {
-        printf(2,"mv: cannot open '%s' No such file or directory\n",from);
+        printf(2,"rename: cannot open '%s' No such file or directory\n",from);
         exit();
     }
     if(fstat(fd0,&st)<0)
     {
-        printf(2,"mv: cannot stat '%s' No such file or directory\n",from);
+        printf(2,"rename: cannot stat '%s' No such file or directory\n",from);
         exit();
     }
-    //char temp[512],temp2[512];
     int a;
     switch(st.type)
     {
@@ -115,14 +113,11 @@ mv_rek(char *from,char *ext1,char *ext2)
 			int flag=0;
 			if(de.inum==0 || de.name[0]=='.') continue;
 			int idx,b,x;
-			//printf(1,"%d\n",strlen(de.name));
 			for(a=0;a<strlen(de.name);a++){
 				idx=0;
 				if(de.name[a]==ext1[0]){
-					//printf(1,"%s %c %c\n",de.name, de.name[a], ext1[0]);
 					for(b=a;b<strlen(de.name);b++){
 						if(de.name[b]!=ext1[idx]){
-							printf(1,"%s %c %c\n",de.name, de.name[b], ext1[idx]);
 							break;
 						}
 						if(idx==strlen(ext1)-1){
@@ -136,15 +131,14 @@ mv_rek(char *from,char *ext1,char *ext2)
 				}
 			}
 			if(!flag)continue;
-			//printf(1,"valid %s\n",de.name);
 			char temp[500];
 			strcpy(temp,de.name);
 			flag=0;idx=0;
 			for(a=x;a<x+strlen(ext2);a++){
 				temp[a]=ext2[idx++];
 			}
-			if(v) printf(1,"%s renamed to %s\n",de.name,temp);
-			if(n) printf(1,"%s\n",de.name);
+            if(o && isExist(temp)) continue; 
+			if(v) printf(1,"%s renamed as %s\n",de.name,temp);
 			if(!n) rename(de.name,temp);
 		}
 		break;
@@ -155,18 +149,21 @@ mv_rek(char *from,char *ext1,char *ext2)
 int main(int argc,char *argv[]){
 	//rename 's\.ext1\/.ext2/' namafile1 namafile2 ...
 	char *ext1,*ext2;
-    	ext1=(char*)malloc(100*sizeof(char));
-    	ext2=(char*)malloc(100*sizeof(char));
-	//int s=0,y=0;
+    ext1=(char*)malloc(100*sizeof(char));
+    ext2=(char*)malloc(100*sizeof(char));
 	int idx=0,a,b;
-	//if(argv[1][1]=='s') s=1;
-	//if(argv[1][1]=='y') y=1;
 	int com;
 	if(argv[1][0]!='-') com=1;
 	else{
-		if(argv[1][1]=='n') n=1;
-		if(argv[1][1]=='v') v=1;
-		com=2;
+        com=1;
+        while(argv[com][0]=='-'){
+		    if(argv[com][1]=='n') n=1;
+		    if(argv[com][1]=='v') v=1;
+            if(argv[com][1]=='h') help();
+            if(argv[com][1]=='V') prog();
+            if(argv[com][1]=='o') o=1; 
+            com++;
+        }
 	}
 	for(a=3;a<strlen(argv[com]);a++){
 		if(argv[com][a]=='/') break;
@@ -179,13 +176,8 @@ int main(int argc,char *argv[]){
 		ext2[idx++]=argv[com][a];
 	}
 	//printf(1,"%s\n",argv[com]);
-	printf(1,"%s %s\n",ext1,ext2);
 	if(argv[com+1][0]=='*'){
-		mv_rek(".",ext1,ext2);	
-	}
-	else if (argv[1][0]=='-'){
-		if (strcmp(argv[1], "-h")==0) help();
-		if (strcmp(argv[1], "-V")==0) prog();
+		rename_rek(".",ext1,ext2);	
 	}
 	else{
 			for(a=2;a<argc;a++){

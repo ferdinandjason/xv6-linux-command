@@ -61,7 +61,7 @@ ls(char *path)
     while(read(fd, &de, sizeof(de)) == sizeof(de)){
       if(de.inum == 0)
         continue;
-      if(!dot && de.name[0]=='.')
+      if(dot==0 && de.name[0]=='.')
         continue;
       memmove(p, de.name, DIRSIZ);
       p[DIRSIZ] = 0;
@@ -69,7 +69,7 @@ ls(char *path)
         printf(1, "ls: cannot stat %s\n", buf);
         continue;
       }
-      if(lo)
+      if(lo==1)
       {
         if(st.type==T_DIR) printf(1, "\033[1m\x1B[34m%s\x1B[0m %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
         else if(st.type==T_DEV) printf(1, "\033[1m\x1B[31m%s\x1B[0m %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
@@ -104,7 +104,7 @@ main(int argc, char *argv[])
   if(help)
   {
     printf(1,"Usage : \033[1mls\x1B[0m [OPTION]... [FILE]...\n");
-    printf(1,"List information about the FILEs (the current directory by default).");
+    printf(1,"List information about the FILEs (the current directory by default).\n");
     printf(1,"OPTION:\n");
     printf(1,"\t\033[1m-a\x1B[0m do not ignore entries starting with .\n");
     printf(1,"\t\033[1m-l\x1B[0m use a long listing format\n");
@@ -114,7 +114,20 @@ main(int argc, char *argv[])
     ls(".");
     exit();
   }
-  for(i=1; i<argc; i++)
-    if(argv[i][0]!='-') ls(argv[i]);
+  else if((lo==1 || dot==1 || help==1) && argc < 3)
+  {
+    ls(".");
+    exit();
+  }
+  else if((lo==1 || dot==1 || help==1) && argc < 4)
+  {
+    ls(argv[2]);
+    exit();
+  }
+  else
+  {
+    ls(argv[1]);
+    exit();
+  }
   exit();
 }

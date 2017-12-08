@@ -4,6 +4,8 @@
 #include "fs.h"
 #include "fcntl.h"
 
+int pertama=0;
+
 char*
 fmtname(char *path)
 {
@@ -25,7 +27,7 @@ strcat(char *d,char *s)
     return temp;
 }
 
-void
+void 
 copy(char *from,char *to) 
 {
     struct stat st;
@@ -88,10 +90,9 @@ copy(char *from,char *to)
     close(fd1);
     free(temp);
     free(buf);
-    exit();
 }
 
-void
+void 
 cp_ls(char *path,int panjang,char *ekstensi)
 {
     char *buff;
@@ -222,7 +223,9 @@ int main(int argc,char *argv[])
 {
     if(argc<2)
     {
-
+        printf(2,"Usage : cp [OPTIONS] [source] [dest]\n");
+        printf(2,"Options:\n");
+        printf(2,"  -R : copy file secara recursive\n");
     }
     if(argv[1][0]=='*')
     {
