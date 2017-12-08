@@ -3,6 +3,7 @@
 #include "user.h"
 #include "fcntl.h"
 #include "fs.h"
+int n=0,v=0;
 char*
 strcat(char *d,char *s)
 {
@@ -84,33 +85,38 @@ mv_rek(char from[512],char ext1[512],char ext2[512])
 		while(read(fd0,&de,sizeof(de))==sizeof(de)){
 			int flag=0;
 			if(de.inum==0 || de.name[0]=='.') continue;
-			int idx=strlen(ext1)-1;
+			int idx,b,x;
 			//printf(1,"%d\n",strlen(de.name));
-			for(a=strlen(de.name)-1;a>=0;a--){
-			//printf(1,"%d\n",a);
-				if(de.name[a]!=ext1[idx]){
-					//printf(1,"%s %c\n",de.name, de.name[a]);
-					flag=1;
-					break;
+			for(a=0;a<strlen(de.name);a++){
+				idx=0;
+				if(de.name[a]==ext1[0]){
+					//printf(1,"%s %c %c\n",de.name, de.name[a], ext1[0]);
+					for(b=a;b<strlen(de.name);b++){
+						if(de.name[b]!=ext1[idx]){
+							printf(1,"%s %c %c\n",de.name, de.name[b], ext1[idx]);
+							break;
+						}
+						if(idx==strlen(ext1)-1){
+							x=b-strlen(ext1)+1;
+							flag=1;
+							break;
+						}
+						idx++;
+					}
+					if(flag) break;
 				}
-				if(de.name[a]=='.') break;
-				idx--;
 			}
-			if(flag)continue;
-			printf(1,"valid %s\n",de.name);
+			if(!flag)continue;
+			//printf(1,"valid %s\n",de.name);
 			char temp[500];
 			strcpy(temp,de.name);
 			flag=0;idx=0;
-			for(a=0;a<strlen(de.name);a++){
-				if(de.name[a]=='.') flag=1;
-				if(idx>=strlen(ext2)) temp[a]=0;
-				else if(flag)temp[a]=ext2[idx++];
+			for(a=x;a<x+strlen(ext2);a++){
+				temp[a]=ext2[idx++];
 			}
-			for(;idx<strlen(ext2);idx++){
-				temp[a++]=ext2[idx];			
-			}
-			printf(1,"%s %s\n",de.name,temp);
-			rename(de.name,temp);
+			if(v) printf(1,"%s renamed to %s\n",de.name,temp);
+			if(n) printf(1,"%s\n",de.name);
+			if(!n) rename(de.name,temp);
 		}
 		break;
 	}
@@ -118,28 +124,36 @@ mv_rek(char from[512],char ext1[512],char ext2[512])
     close(fd0);
 }
 int main(int argc,char *argv[]){
-	//rename 's\.ext1\/.ext2/' namafile1 namafile2 ...
+	//rename 's/.ext1/.ext2/' namafile1 namafile2 ...
 	char ext1[100],ext2[100];
 	//int s=0,y=0;
 	int idx=0,a,b;
 	//if(argv[1][1]=='s') s=1;
 	//if(argv[1][1]=='y') y=1;
-	for(a=3;a<strlen(argv[1]);a++){
-		if(argv[1][a]=='\\') break;
-		ext1[idx++]=argv[1][a];
+	int com;
+	if(argv[1][0]!='-') com=1;
+	else{
+		if(argv[1][1]=='n') n=1;
+		if(argv[1][1]=='v') v=1;
+		com=2;
 	}
-	a+=2;
+	for(a=3;a<strlen(argv[com]);a++){
+		if(argv[com][a]=='/') break;
+		ext1[idx++]=argv[com][a];
+	}
+	a++;
 	idx=0;
-	for(;a<strlen(argv[1]);a++){
-		if(argv[1][a]=='/') break;
-		ext2[idx++]=argv[1][a];
+	for(;a<strlen(argv[com]);a++){
+		if(argv[com][a]=='/') break;
+		ext2[idx++]=argv[com][a];
 	}
+	//printf(1,"%s\n",argv[com]);
 	printf(1,"%s %s\n",ext1,ext2);
-	if(argv[2][0]=='*'){
+	if(argv[com+1][0]=='*'){
 		mv_rek(".",ext1,ext2);	
 	}
 	else{
-		for(a=2;a<argc;a++){
+		for(a=com+1;a<argc;a++){
 			char tmp[100];
 			strcpy(tmp,argv[a]);
 			int len=strlen(ext1);
