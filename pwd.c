@@ -33,7 +33,11 @@ int main(int argc,char *argv[])
         if(strcmp(argv[1],"-P")==0) physical=1;
         if(strcmp(argv[1],"--help")==0) help();
         if(strcmp(argv[1],"--versi")==0) prog();
-	else printf(1,"pwd: invalid opsi %s\nCoba ketik 'pwd --help' untuk info lebih lanjut\n",argv[1]);
+	else 
+	{
+		printf(1,"pwd: invalid opsi %s\nCoba ketik 'pwd --help' untuk info lebih lanjut\n",argv[1]);
+		exit();
+	}
     }
     if(err<0) 
     {
