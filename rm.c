@@ -21,9 +21,10 @@ strcat(char *d,char *s)
 }
 
 void
-rm_rf(char path[512])
+rm_rf(char *path)
 {
-    char buff[512];
+    char *buff;
+    buff=(char*)malloc(512*sizeof(char));
     int fd0;
     struct dirent de;
     struct stat st;
@@ -53,15 +54,16 @@ rm_rf(char path[512])
             int len=strlen(buff);
             while(read(fd0,&de,sizeof(de))==sizeof(de))
             {
-                if(de.inum==0 || de.name[0]=='.')
-                    continue;
+                if(de.inum==0 || de.name[0]=='.') continue;
                 memmove(buff+len,de.name,strlen(de.name));
                 rm_rf(buff);
                 memset(buff+len,'\0',sizeof(buff)+len);
             }
+            unlink(path);
             break;   
         }
     }
+    free(buff);
     close(fd0);
 }
 

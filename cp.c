@@ -26,9 +26,8 @@ strcat(char *d,char *s)
 }
 
 void
-copy(char *from,char *to)
+copy(char *from,char *to) 
 {
-    printf(1,"masuk ke copy : %s %s\n",from,to);
     struct stat st;
     char *buf;
     buf=(char*)malloc(512*sizeof(char));
@@ -60,11 +59,12 @@ copy(char *from,char *to)
         // JIKA ADALAH DIREKTORI
         if(fstat(fd1,&st)>=0 && st.type == T_DIR)
         {
+            mkdir(to);
             strcat(temp,to);
             strcat(temp,"/");
             strcat(temp,from);
             close(fd1);
-            if((fd1=open(temp,O_CREAT | O_TRUNC | O_WRONLY))<0)
+            if((fd1=open(temp,O_CREATE | O_RDWR))<0)
             {
                 printf(2,"cp: error while create '%s'\n",temp);
                 exit();
@@ -73,7 +73,7 @@ copy(char *from,char *to)
         // JIKA ADALAH FILE
         else{
             close(fd1);
-            if((fd1=open(to,O_CREAT | O_TRUNC | O_WRONLY))<0)
+            if((fd1=open(to,O_CREATE | O_RDWR))<0)
             {
                 printf(2,"cp: error while create '%s'\n",to);
                 exit();
@@ -234,7 +234,14 @@ int main(int argc,char *argv[])
     }
     else if(strcmp(argv[1],"-R")==0)
     {
+        char *temp;
+        temp=(char*)malloc(512*sizeof(char*));
+        strcat(temp,argv[3]);
+        strcat(temp,"/");
+        strcat(temp,argv[2]);
+        mkdir(temp);
         cp_rek(argv[2],argv[3]);
+        free(temp);
         exit();
     }
     else
