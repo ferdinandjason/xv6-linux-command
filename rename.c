@@ -6,23 +6,29 @@
 
 
 void help(){
-printf (1,"Usage\n");
-printf (1,"rename [OPTION] ekspresi\n");
-printf (1,"Options:\n");
-printf (1,"-s : TIdak rename symlink, tetapi rename target\n");
-printf (1,"-v : Menunjukan file mana saja yang telah di rename, apabila ada\n");
-printf (1,"-n : Tidak melakukan perubahan apapun\n");
-printf (1,"-o : Tidak overwrite file yang telah ada\n");
-printf (1,"-V : Menunjukkan informasi tentang versi lalu exit\n");
-exit();
+    printf (1,"Usage\n");
+    printf (1,"rename [OPTION] ekspresi\n");
+    printf (1,"Options:\n");
+    printf (1,"-s : TIdak rename symlink, tetapi rename target\n");
+    printf (1,"-v : Menunjukan file mana saja yang telah di rename, apabila ada\n");
+    printf (1,"-n : Tidak melakukan perubahan apapun\n");
+    printf (1,"-o : Tidak overwrite file yang telah ada\n");
+    printf (1,"-V : Menunjukkan informasi tentang versi lalu exit\n");
+    exit();
 }
 
 void prog(){
-printf (1,"Rename version 1.00\n");
-printf(1,"Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
-exit();
+    printf (1,"Rename version 1.00\n");
+    printf(1,"Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
+    exit();
 }
 
+int isExist(char *argv)
+{
+    int err2;
+    if((err2=open(argv,O_RDWR))>0) return 1;
+    else return 0;
+}
 
 char*
 strcat(char *d,char *s)
