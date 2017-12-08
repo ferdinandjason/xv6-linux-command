@@ -31,8 +31,8 @@ int main(int argc,char *argv[])
     {
         if(strcmp(argv[1],"-L")==0) {logical=1;physical=0;}
         if(strcmp(argv[1],"-P")==0) physical=1;
-        if(strcmp(argv[1],"-H")==0) help();
-        if(strcmp(argv[1],"-V")==0) prog();
+        if(strcmp(argv[1],"-h")==0) help();
+        if(strcmp(argv[1],"-v")==0) prog();
     }
     if(err<0) 
     {

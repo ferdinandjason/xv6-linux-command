@@ -162,7 +162,7 @@ int main(int argc,char *argv[]){
 		mv_rek(".",ext1,ext2);	
 	}
 	else if (argv[1][0]=='-'){
-		if (strcmp(argv[1], "-H")==0) help();
+		if (strcmp(argv[1], "-h")==0) help();
 		if (strcmp(argv[1], "-V")==0) prog();
 	}
 	else{
