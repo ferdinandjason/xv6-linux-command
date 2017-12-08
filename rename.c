@@ -3,6 +3,27 @@
 #include "user.h"
 #include "fcntl.h"
 #include "fs.h"
+
+
+void help(){
+printf (1,"Usage\n");
+printf (1,"rename [OPTION] ekspresi\n");
+printf (1,"Options:\n");
+printf (1,"-s : TIdak rename symlink, tetapi rename target\n");
+printf (1,"-v : Menunjukan file mana saja yang telah di rename, apabila ada\n");
+printf (1,"-n : Tidak melakukan perubahan apapun\n");
+printf (1,"-o : Tidak overwrite file yang telah ada\n");
+printf (1,"-V : Menunjukkan informasi tentang versi lalu exit\n");
+exit();
+}
+
+void prog(){
+printf (1,"Rename version 1.00\n");
+printf("Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
+exit();
+}
+
+
 char*
 strcat(char *d,char *s)
 {
@@ -137,6 +158,10 @@ int main(int argc,char *argv[]){
 	printf(1,"%s %s\n",ext1,ext2);
 	if(argv[2][0]=='*'){
 		mv_rek(".",ext1,ext2);	
+	}
+	else if (argv[1][0]=='-'){
+		if (strcmp(argv[1], "-H")==0) help();
+		if (strcmp(argv[1], "-V")==0) prog();
 	}
 	else{
 		for(a=2;a<argc;a++){
