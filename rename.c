@@ -19,7 +19,7 @@ exit();
 
 void prog(){
 printf (1,"Rename version 1.00\n");
-printf("Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
+printf(1,"Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
 exit();
 }
 
