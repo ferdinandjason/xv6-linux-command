@@ -161,33 +161,14 @@ int main(int argc,char *argv[]){
 	if(argv[2][0]=='*'){
 		mv_rek(".",ext1,ext2);	
 	}
-<<<<<<< HEAD
-	printf(1,"%s %s\n",ext1,ext2);
-	for(a=2;a<argc;a++){
-		char *tmp;
-        tmp=(char*)malloc(100*sizeof(char));
-		strcpy(tmp,argv[a]);
-		int len=strlen(ext1);
-		int len2=strlen(argv[a]);
-		idx=0;
-		for(b=len2-len;;b++){
-			tmp[b]=ext2[idx];
-			idx++;
-			if(idx==strlen(ext2)) break;
-		}
-		for(;idx<strlen(ext1);idx++){
-			tmp[++b]=0;	
-		}
-		rename(argv[a],tmp);
-        free(tmp);
-=======
 	else if (argv[1][0]=='-'){
 		if (strcmp(argv[1], "-H")==0) help();
 		if (strcmp(argv[1], "-V")==0) prog();
 	}
 	else{
 		for(a=2;a<argc;a++){
-			char tmp[100];
+			char *tmp;
+            tmp=(char*)malloc(100*sizeof(char));
 			strcpy(tmp,argv[a]);
 			int len=strlen(ext1);
 			int len2=strlen(argv[a]);
@@ -202,7 +183,6 @@ int main(int argc,char *argv[]){
 			}
 			rename(argv[a],tmp);
 		}
->>>>>>> 9ef8eb773347a3233fa6ce8d66bc9ccc620e1a80
 	}
     free(ext1);
     free(ext2);
