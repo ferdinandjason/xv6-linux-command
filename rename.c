@@ -3,6 +3,27 @@
 #include "user.h"
 #include "fcntl.h"
 #include "fs.h"
+
+
+void help(){
+printf (1,"Usage\n");
+printf (1,"rename [OPTION] ekspresi\n");
+printf (1,"Options:\n");
+printf (1,"-s : TIdak rename symlink, tetapi rename target\n");
+printf (1,"-v : Menunjukan file mana saja yang telah di rename, apabila ada\n");
+printf (1,"-n : Tidak melakukan perubahan apapun\n");
+printf (1,"-o : Tidak overwrite file yang telah ada\n");
+printf (1,"-V : Menunjukkan informasi tentang versi lalu exit\n");
+exit();
+}
+
+void prog(){
+printf (1,"Rename version 1.00\n");
+printf(1,"Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
+exit();
+}
+
+
 char*
 strcat(char *d,char *s)
 {
@@ -81,23 +102,38 @@ mv_rek(char *from,char *ext1,char *ext2)
         }
         case T_DIR:
         {
-		int flag=0;
 		while(read(fd0,&de,sizeof(de))==sizeof(de)){
+			int flag=0;
 			if(de.inum==0 || de.name[0]=='.') continue;
 			int idx=strlen(ext1)-1;
 			//printf(1,"%d\n",strlen(de.name));
-			for(a=strlen(de.name)-1;a>strlen(de.name)-strlen(ext1);a--){
+			for(a=strlen(de.name)-1;a>=0;a--){
 			//printf(1,"%d\n",a);
 				if(de.name[a]!=ext1[idx]){
+					//printf(1,"%s %c\n",de.name, de.name[a]);
 					flag=1;
 					break;
 				}
+				if(de.name[a]=='.') break;
+				idx--;
 			}
-			idx--;
-		if(flag)continue;
-		printf(1,"%s\n",de.name);
+			if(flag)continue;
+			printf(1,"valid %s\n",de.name);
+			char temp[500];
+			strcpy(temp,de.name);
+			flag=0;idx=0;
+			for(a=0;a<strlen(de.name);a++){
+				if(de.name[a]=='.') flag=1;
+				if(idx>=strlen(ext2)) temp[a]=0;
+				else if(flag)temp[a]=ext2[idx++];
+			}
+			for(;idx<strlen(ext2);idx++){
+				temp[a++]=ext2[idx];			
+			}
+			printf(1,"%s %s\n",de.name,temp);
+			rename(de.name,temp);
 		}
-            break;
+		break;
 	}
     }
     close(fd0);
@@ -121,9 +157,11 @@ int main(int argc,char *argv[]){
 		if(argv[1][a]=='/') break;
 		ext2[idx++]=argv[1][a];
 	}
+	printf(1,"%s %s\n",ext1,ext2);
 	if(argv[2][0]=='*'){
 		mv_rek(".",ext1,ext2);	
 	}
+<<<<<<< HEAD
 	printf(1,"%s %s\n",ext1,ext2);
 	for(a=2;a<argc;a++){
 		char *tmp;
@@ -142,6 +180,29 @@ int main(int argc,char *argv[]){
 		}
 		rename(argv[a],tmp);
         free(tmp);
+=======
+	else if (argv[1][0]=='-'){
+		if (strcmp(argv[1], "-H")==0) help();
+		if (strcmp(argv[1], "-V")==0) prog();
+	}
+	else{
+		for(a=2;a<argc;a++){
+			char tmp[100];
+			strcpy(tmp,argv[a]);
+			int len=strlen(ext1);
+			int len2=strlen(argv[a]);
+			idx=0;
+			for(b=len2-len;;b++){
+				tmp[b]=ext2[idx];
+				idx++;
+				if(idx==strlen(ext2)) break;
+			}
+			for(;idx<strlen(ext1);idx++){
+				tmp[++b]=0;	
+			}
+			rename(argv[a],tmp);
+		}
+>>>>>>> 9ef8eb773347a3233fa6ce8d66bc9ccc620e1a80
 	}
     free(ext1);
     free(ext2);
