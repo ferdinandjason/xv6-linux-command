@@ -81,23 +81,38 @@ mv_rek(char from[512],char ext1[512],char ext2[512])
         }
         case T_DIR:
         {
-		int flag=0;
 		while(read(fd0,&de,sizeof(de))==sizeof(de)){
+			int flag=0;
 			if(de.inum==0 || de.name[0]=='.') continue;
 			int idx=strlen(ext1)-1;
 			//printf(1,"%d\n",strlen(de.name));
-			for(a=strlen(de.name)-1;a>strlen(de.name)-strlen(ext1);a--){
+			for(a=strlen(de.name)-1;a>=0;a--){
 			//printf(1,"%d\n",a);
 				if(de.name[a]!=ext1[idx]){
+					//printf(1,"%s %c\n",de.name, de.name[a]);
 					flag=1;
 					break;
 				}
+				if(de.name[a]=='.') break;
+				idx--;
 			}
-			idx--;
-		if(flag)continue;
-		printf(1,"%s\n",de.name);
+			if(flag)continue;
+			printf(1,"valid %s\n",de.name);
+			char temp[500];
+			strcpy(temp,de.name);
+			flag=0;idx=0;
+			for(a=0;a<strlen(de.name);a++){
+				if(de.name[a]=='.') flag=1;
+				if(idx>=strlen(ext2)) temp[a]=0;
+				else if(flag)temp[a]=ext2[idx++];
+			}
+			for(;idx<strlen(ext2);idx++){
+				temp[a++]=ext2[idx];			
+			}
+			printf(1,"%s %s\n",de.name,temp);
+			rename(de.name,temp);
 		}
-            break;
+		break;
 	}
     }
     close(fd0);
@@ -119,25 +134,27 @@ int main(int argc,char *argv[]){
 		if(argv[1][a]=='/') break;
 		ext2[idx++]=argv[1][a];
 	}
+	printf(1,"%s %s\n",ext1,ext2);
 	if(argv[2][0]=='*'){
 		mv_rek(".",ext1,ext2);	
 	}
-	printf(1,"%s %s\n",ext1,ext2);
-	for(a=2;a<argc;a++){
-		char tmp[100];
-		strcpy(tmp,argv[a]);
-		int len=strlen(ext1);
-		int len2=strlen(argv[a]);
-		idx=0;
-		for(b=len2-len;;b++){
-			tmp[b]=ext2[idx];
-			idx++;
-			if(idx==strlen(ext2)) break;
+	else{
+		for(a=2;a<argc;a++){
+			char tmp[100];
+			strcpy(tmp,argv[a]);
+			int len=strlen(ext1);
+			int len2=strlen(argv[a]);
+			idx=0;
+			for(b=len2-len;;b++){
+				tmp[b]=ext2[idx];
+				idx++;
+				if(idx==strlen(ext2)) break;
+			}
+			for(;idx<strlen(ext1);idx++){
+				tmp[++b]=0;	
+			}
+			rename(argv[a],tmp);
 		}
-		for(;idx<strlen(ext1);idx++){
-			tmp[++b]=0;	
-		}
-		rename(argv[a],tmp);
 	}
 	exit();
 }
