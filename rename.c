@@ -53,7 +53,7 @@ void rename(char *argv1, char *argv2)
   close(fd1);
 }
 void
-mv_rek(char from[512],char ext1[512],char ext2[512])
+mv_rek(char *from,char *ext1,char *ext2)
 {
     //char buff[1024];
     int fd0;
@@ -104,7 +104,9 @@ mv_rek(char from[512],char ext1[512],char ext2[512])
 }
 int main(int argc,char *argv[]){
 	//rename 's\.ext1\/.ext2/' namafile1 namafile2 ...
-	char ext1[100],ext2[100];
+	char *ext1,*ext2;
+    ext1=(char*)malloc(100*sizeof(char));
+    ext2=(char*)malloc(100*sizeof(char));
 	//int s=0,y=0;
 	int idx=0,a,b;
 	//if(argv[1][1]=='s') s=1;
@@ -124,7 +126,8 @@ int main(int argc,char *argv[]){
 	}
 	printf(1,"%s %s\n",ext1,ext2);
 	for(a=2;a<argc;a++){
-		char tmp[100];
+		char *tmp;
+        tmp=(char*)malloc(100*sizeof(char));
 		strcpy(tmp,argv[a]);
 		int len=strlen(ext1);
 		int len2=strlen(argv[a]);
@@ -138,6 +141,9 @@ int main(int argc,char *argv[]){
 			tmp[++b]=0;	
 		}
 		rename(argv[a],tmp);
+        free(tmp);
 	}
+    free(ext1);
+    free(ext2);
 	exit();
 }
