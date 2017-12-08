@@ -3,12 +3,10 @@
 #include "user.h"
 #include "fcntl.h"
 #include "fs.h"
-<<<<<<< HEAD
 int n=0,v=0;
-=======
 
-
-void help(){
+void 
+help(){
     printf (1,"Usage\n");
     printf (1,"rename [OPTION] ekspresi\n");
     printf (1,"Options:\n");
@@ -20,20 +18,21 @@ void help(){
     exit();
 }
 
-void prog(){
+void 
+prog(){
     printf (1,"Rename version 1.00\n");
     printf(1,"Dibuat oleh Ferdinand Jason, Nurlita Dhuha, Alvin Tanuwijaya, Bagus Aji Sinto\n");
     exit();
 }
 
-int isExist(char *argv)
+int 
+isExist(char *argv)
 {
     int err2;
     if((err2=open(argv,O_RDWR))>0) return 1;
     else return 0;
 }
 
->>>>>>> c874929bdf4eb503b5984e008b215190e2069590
 char*
 strcat(char *d,char *s)
 {
@@ -154,15 +153,10 @@ mv_rek(char *from,char *ext1,char *ext2)
     close(fd0);
 }
 int main(int argc,char *argv[]){
-<<<<<<< HEAD
-	//rename 's/.ext1/.ext2/' namafile1 namafile2 ...
-	char ext1[100],ext2[100];
-=======
 	//rename 's\.ext1\/.ext2/' namafile1 namafile2 ...
 	char *ext1,*ext2;
-    ext1=(char*)malloc(100*sizeof(char));
-    ext2=(char*)malloc(100*sizeof(char));
->>>>>>> c874929bdf4eb503b5984e008b215190e2069590
+    	ext1=(char*)malloc(100*sizeof(char));
+    	ext2=(char*)malloc(100*sizeof(char));
 	//int s=0,y=0;
 	int idx=0,a,b;
 	//if(argv[1][1]=='s') s=1;
@@ -194,14 +188,9 @@ int main(int argc,char *argv[]){
 		if (strcmp(argv[1], "-V")==0) prog();
 	}
 	else{
-<<<<<<< HEAD
-		for(a=com+1;a<argc;a++){
-			char tmp[100];
-=======
-		for(a=2;a<argc;a++){
+			for(a=2;a<argc;a++){
 			char *tmp;
-            tmp=(char*)malloc(100*sizeof(char));
->>>>>>> c874929bdf4eb503b5984e008b215190e2069590
+	                tmp=(char*)malloc(100*sizeof(char));
 			strcpy(tmp,argv[a]);
 			int len=strlen(ext1);
 			int len2=strlen(argv[a]);
