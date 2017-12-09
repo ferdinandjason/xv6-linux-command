@@ -1,4 +1,4 @@
-X# FPE8-SistemOperasi
+# FPE8-SistemOperasi
 
 Final Project Sistem Operasi - Membuat Command pada xv6
 
