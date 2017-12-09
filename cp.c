@@ -137,8 +137,8 @@ cp_ls(char *path,int panjang,char *ekstensi)
             continue;
         if(stat(de.name, &st) >= 0 && st.type == T_DIR) continue;
         memmove(buff+len,de.name,strlen(de.name));
-        //if(strcmp(de.name+(strlen(de.name)-panjang-1),ekstensi)==0) 
-        copy(de.name,buff);
+        if(strcmp(de.name+(strlen(de.name)-panjang+1),ekstensi)==0) 
+            copy(de.name,buff);
         memset(buff+len,'\0',sizeof(buff)+len);
     }
     free(buff);
