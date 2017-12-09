@@ -1,4 +1,4 @@
-# FPE8-SistemOperasi
+X# FPE8-SistemOperasi
 
 Final Project Sistem Operasi - Membuat Command pada xv6
 
@@ -12,11 +12,11 @@ Final Project Sistem Operasi - Membuat Command pada xv6
 - [X] `rm -rf`
 - [X] `cd`
 - [X] `clear`
-- [ ] `rename`
-- [ ] `rename -s`
-- [ ] `rename -v`
-- [ ] `rename -n`
-- [ ] `rename -o`
+- [X] `rename`
+- [X] `rename -s`
+- [X] `rename -v`
+- [X] `rename -n`
+- [X] `rename -o`
 - [X] `pwd`
 - [X] `pwd -l`
 - [X] `pwd -p`
